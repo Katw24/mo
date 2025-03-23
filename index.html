@@ -1,132 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moveable Images with Stacking</title>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <title>Teste mosaicos</title>
+    <imagetitle></imagetitle>
     <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f2f5;
-        }
-        .container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        .image {
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            cursor: grab;
-            user-select: none;
-        }
-        .stack-counter {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: black;
-            font-weight: bold;
-            font-size: 16px;
-            display: block; /* Always visible on load */
-        }
+      .title {
+       font-size: 1.5rem;
+        text-align: center;
+        font-family: sans-serif
+      }
+      body {
+        background: #a8c8a7
+      }
+      .linkinicio {
+      display: flex; /* Use flexbox for centering */
+       justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+      }
+      .linkinicio img {
+       height: auto; /* Maintain aspect ratio */
+        display: block;
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Fixed Image -->
-        <div class="fixed-image" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0;">
-            <img src="/Mosaicos/9c554a24-513e-4a59-9b7d-1bfd462e6d8e.jpeg" style="width: 400px; pointer-events: none;">
-        </div>
-        <!-- First Group -->
-        <div class="image" style="top: 100px; left: 100px; z-index: 1;">
-            <div class="stack-counter">1</div>
-            <img src="https://via.placeholder.com/150">
-        </div>
-        <div class="image" style="top: 100px; left: 100px; z-index: 2;">
-            <div class="stack-counter">2</div>
-            <img src="https://via.placeholder.com/150/FF5733">
-        </div>
-
-        <!-- Second Group -->
-        <div class="image" style="top: 300px; left: 300px; z-index: 1;">
-            <div class="stack-counter">1</div>
-            <img src="https://via.placeholder.com/150/00FF00">
-        </div>
-        <div class="image" style="top: 300px; left: 300px; z-index: 2;">
-            <div class="stack-counter">2</div>
-            <img src="https://via.placeholder.com/150/0000FF">
-        </div>
+  </head>
+  <body>
+    <h1 class="title">Teste Cubos</h1>
+    <div class="linkContainer.inicio">
+      <a class="linkinicio" href="./a1.html">
+        <img
+          src="./outros/botaoinicial.png"
+          alt="próximo.inicio"
+          width="30%"
+        />
+      </a>
     </div>
-
-    <script>
-        let zIndexCounter = 10;  // Start z-index higher for clarity
-
-        document.querySelectorAll('.image').forEach(img => {
-            const counter = img.querySelector('.stack-counter');
-            counter.style.display = document.querySelectorAll('.image').length > 1 ? 'block' : 'none';
-
-            img.addEventListener('mousedown', function(event) {
-                if (event.button !== 0) return; // Ensure only left mouse button triggers movement
-
-                const image = event.currentTarget;
-                let startX = event.clientX;
-                let startY = event.clientY;
-                let initialLeft = parseInt(image.style.left) || 0;
-                let initialTop = parseInt(image.style.top) || 0;
-
-                image.style.zIndex = ++zIndexCounter; // Bring the dragged image to the front
-
-                function moveImage(e) {
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
-                    image.style.left = initialLeft + dx + 'px';
-                    image.style.top = initialTop + dy + 'px';
-                }
-
-                function stopMove() {
-                    let stackedCount = 0;
-                    document.querySelectorAll('.image').forEach(otherImage => {
-                        if (otherImage !== image) {
-                            const imgRect = image.getBoundingClientRect();
-                            const otherRect = otherImage.getBoundingClientRect();
-
-                            const expandedArea = 50; // Increase stacking area
-
-                            if (
-                                imgRect.left < otherRect.right + expandedArea &&
-                                imgRect.right > otherRect.left - expandedArea &&
-                                imgRect.top < otherRect.bottom + expandedArea &&
-                                imgRect.bottom > otherRect.top - expandedArea
-                            ) {
-                                image.style.left = otherRect.left + 'px';
-                                image.style.top = otherRect.top + 'px';
-                                stackedCount++;
-                            }
-                        }
-                    });
-
-                    if (stackedCount > 0) {
-                        counter.textContent = stackedCount;
-                        counter.style.display = 'block';
-                    } else {
-                        counter.style.display = 'none';
-                    }
-
-                    window.removeEventListener('mousemove', moveImage);
-                    window.removeEventListener('mouseup', stopMove);
-                }
-
-                window.addEventListener('mousemove', moveImage);
-                window.addEventListener('mouseup', stopMove);
-            });
-        });
-    </script>
-</body>
+  </body>
 </html>
