@@ -86,9 +86,20 @@
     </style>
 </head>
 <body>
+           <!-- Magnetic Points -->
+           <div class="magnetic-point" data-x="76" data-y="81"></div>
+           <div class="magnetic-point" data-x="189" data-y="81"></div>
+           <div class="magnetic-point" data-x="301" data-y="81"></div>
+           <div class="magnetic-point" data-x="76" data-y="195"></div>
+           <div class="magnetic-point" data-x="189" data-y="195"></div>
+           <div class="magnetic-point" data-x="301" data-y="195"></div>
+           <div class="magnetic-point" data-x="76" data-y="308"></div>
+           <div class="magnetic-point" data-x="189" data-y="308"></div>
+           <div class="magnetic-point" data-x="301" data-y="308"></div>
+       </div>
     <div class="container">
         <div class="fixed-image">
-            <img src="./mosaicos/tab.png" style="width: 500px;">
+            <img src="./mosaicos/tab.png" style="width: 495px;">
         </div>
             <!-- Image Box (upper-right) -->
             <div class="image-box">
@@ -158,39 +169,82 @@
         </a>
     </div>
 
-<script>
-    let zIndexCounter = 10;
-
-    document.querySelectorAll('.image').forEach(img => {
+    <script>
+        let zIndexCounter = 10;
+    
+        document.querySelectorAll('.image').forEach(img => {
+            img.classList.add('rotatable');
+    
+            img.addEventListener('mousedown', function(event) {
+                if (event.button !== 0) return;
+    
+                const image = event.currentTarget;
+    
+                const offsetX = event.clientX - image.getBoundingClientRect().left;
+                const offsetY = event.clientY - image.getBoundingClientRect().top;
+    
+                image.style.zIndex = ++zIndexCounter;
+    
+                function moveImage(e) {
+                    const posX = e.clientX - offsetX;
+                    const posY = e.clientY - offsetY;
+    
+                    image.style.left = posX + 'px';
+                    image.style.top = posY + 'px';
+                }
+    
+                function stopMove() {
+                    window.removeEventListener('mousemove', moveImage);
+                    window.removeEventListener('mouseup', stopMove);
+                }
+    
+                window.addEventListener('mousemove', moveImage);
+                window.addEventListener('mouseup', stopMove);
+            });
+    
+            const rotationBtn = img.querySelector('.rotation-btn');
+            let rotationAngle = 0;
+            rotationBtn.addEventListener('click', () => {
+                rotationAngle += 90;
+                img.style.transform = `rotate(${rotationAngle}deg)`;
+            });
+        });
+        document.querySelectorAll('.image').forEach(img => {
         img.classList.add('rotatable');
-
+    
         img.addEventListener('mousedown', function(event) {
             if (event.button !== 0) return;
-
+    
             const image = event.currentTarget;
-
+    
             const offsetX = event.clientX - image.getBoundingClientRect().left;
             const offsetY = event.clientY - image.getBoundingClientRect().top;
-
+    
             image.style.zIndex = ++zIndexCounter;
-
+    
             function moveImage(e) {
                 const posX = e.clientX - offsetX;
                 const posY = e.clientY - offsetY;
-
+    
                 image.style.left = posX + 'px';
                 image.style.top = posY + 'px';
+    
+                // Added magnetism check during movement
+                checkMagnetism(image);
             }
-
+    
             function stopMove() {
                 window.removeEventListener('mousemove', moveImage);
                 window.removeEventListener('mouseup', stopMove);
+    
+                // Ensure magnetism is checked one final time
+                checkMagnetism(image);
             }
-
+    
             window.addEventListener('mousemove', moveImage);
             window.addEventListener('mouseup', stopMove);
         });
-
+    
         const rotationBtn = img.querySelector('.rotation-btn');
         let rotationAngle = 0;
         rotationBtn.addEventListener('click', () => {
@@ -198,6 +252,27 @@
             img.style.transform = `rotate(${rotationAngle}deg)`;
         });
     });
-</script>
+    
+    function checkMagnetism(image) {
+        const proximityThreshold = 30;
+        const imageRect = image.getBoundingClientRect();
+        const fixedImageRect = document.querySelector('.fixed-image').getBoundingClientRect();
+    
+        document.querySelectorAll('.magnetic-point').forEach(point => {
+            const magnetX = fixedImageRect.left + parseInt(point.getAttribute('data-x'));
+            const magnetY = fixedImageRect.top + parseInt(point.getAttribute('data-y'));
+    
+            const distance = Math.sqrt(
+                Math.pow(imageRect.left - magnetX, 2) +
+                Math.pow(imageRect.top - magnetY, 2)
+            );
+    
+            if (distance < proximityThreshold) {
+                image.style.left = magnetX + 'px';
+                image.style.top = magnetY + 'px';
+            }
+        });
+    }
+    </script>
 </body>
 </html>
